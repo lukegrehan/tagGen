@@ -20,16 +20,18 @@ class Doc:
         self._result.append(''.join(txt))
 
     @contextmanager
-    def tag(self, name, self_closing=False, *attrs, **kwattrs):
-        endTag = ">" if not self_closing else "/>"
-        self.text("<", name, _mkAttribs(attrs, kwattrs), endTag, safe=True)
+    def tag(self, name, *attrs, **kwattrs):
+        self.text("<", name, _mkAttribs(attrs, kwattrs), ">", safe=True)
         yield
-        if not self_closing:
-            self.text("</", name, ">", safe=True)
+        self.text("</", name, ">", safe=True)
+
+    def self_closing(self, name, *attrs, **kwattrs):
+        self.text("<", name, _mkAttribs(attrs, kwattrs), "/>", safe=True)
 
     def line(self, name, cont, *args, **kwargs):
         with self.tag(name, *args, **kwargs):
             self.text(cont)
+
 
     def render(self):
         return '\n'.join(self._result)
