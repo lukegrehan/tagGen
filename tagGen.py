@@ -32,10 +32,26 @@ class Doc:
         with self.tag(name, *args, **kwargs):
             self.text(cont)
 
+    def _mkTag(name, self_closing=False):
+        if self_closing:
+            def _inner(self, *attrs, **kwattrs):
+                self.self_closing(name, *attrs, **kwattrs)
+        else:
+            @contextmanager
+            def _inner(self, *attrs, **kwattrs):
+                with self.tag(name, *attrs, **kwattrs):
+                    yield
+        return _inner
+
+    html = _mkTag("html")
+    p = _mkTag("p")
+    div = _mkTag("div")
+    a = _mkTag("a", self_closing=True)
+    br = _mkTag("br", self_closing=True)
+
 
     def render(self):
         return '\n'.join(self._result)
-
 
 def _mkAttribs(attrs, kwattrs):
     attrs = list(map(lambda a:' "'+str(a)+'"', attrs))
